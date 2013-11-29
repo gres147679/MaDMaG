@@ -25,6 +25,7 @@ componer = componer' directorio
 componer' :: String -> IO ()
 componer' dir = do
   (seqs, filenames) <- loadMusicXmls dir
+
   -- let modelo = ...
   -- let composicion = ...
   putStrLn $ show composicion
