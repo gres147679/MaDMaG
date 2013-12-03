@@ -39,5 +39,17 @@ buscarElementoOrden2 aBuscar contexto = filter f contexto
 	where
 		f x = (fst x) == aBuscar
 
-normalizar :: Contexto -> Contexto
-normalizar contexto = 
+
+siguienteEvento :: Contexto -> Float -> Evento
+siguienteEvento contexto proba = siguiente contexto proba 0.0
+	where 
+		siguiente (x:contex) prob acum = 
+			if (acum + (snd x) )>=prob
+			then last $ fst x
+			else siguiente contex prob (acum + (snd x))
+
+ev :: Int -> Int -> (Int,Int)
+ev x y = (x,y)
+
+f1 :: Float -> Float
+f1 x = x
