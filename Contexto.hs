@@ -31,4 +31,4 @@ construirMapaRepeticiones lista = fromList $ zip lista (Prelude.map (calculaRepe
 --construirMapaRepeticiones' lista = fromList [(x,y) | x <- lista , y <- [(calculaRepeticiones lista x)]]
 
 distanciaEntreModelos :: (Data.Map.Map [Evento] Int) -> (Data.Map.Map [Evento] Int) -> Int
-distanciaEntreModelos pieza1 pieza2 = sqrt $ sum $ Prelude.map (\x -> ((pieza1 ! x) - (pieza2 ! x))^2 ) (keys pieza1)
+distanciaEntreModelos pieza1 pieza2 = sqrt $ fromIntegral $ sum $ Prelude.map (\x -> ((pieza1 ! x) - (pieza2 ! x))^2 ) (keys pieza1)
