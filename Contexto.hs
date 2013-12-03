@@ -1,7 +1,8 @@
 module Contexto where
 
 import Input
-import Data.Map
+import Data.Map (Map, fromList, keys, (!) )
+
 
 type Contexto = [ ([Evento],Float) ]
 
@@ -30,5 +31,13 @@ construirMapaRepeticiones lista = fromList $ zip lista (Prelude.map (calculaRepe
 --construirMapaRepeticiones':: [Evento] -> Data.Map.Map Evento Int
 --construirMapaRepeticiones' lista = fromList [(x,y) | x <- lista , y <- [(calculaRepeticiones lista x)]]
 
-distanciaEntreModelos :: (Data.Map.Map [Evento] Int) -> (Data.Map.Map [Evento] Int) -> Int
-distanciaEntreModelos pieza1 pieza2 = sqrt $ fromIntegral $ sum $ Prelude.map (\x -> ((pieza1 ! x) - (pieza2 ! x))^2 ) (keys pieza1)
+distanciaEntreModelos :: (Data.Map.Map [Evento] Integer) -> (Data.Map.Map [Evento] Integer) -> Float
+distanciaEntreModelos pieza1 pieza2 = sqrt $ fromInteger $ sum $ Prelude.map (\x -> ((pieza1 ! x) - (pieza2 ! x))^2 ) (keys pieza1)
+
+buscarElementoOrden2 :: [Evento] -> Contexto -> Contexto
+buscarElementoOrden2 aBuscar contexto = filter f contexto
+	where
+		f x = (fst x) == aBuscar
+
+normalizar :: Contexto -> Contexto
+normalizar contexto = 
