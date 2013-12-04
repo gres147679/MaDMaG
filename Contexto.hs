@@ -1,14 +1,14 @@
 module Contexto where
 
 import Input
+import System.Random
 import Data.Map (Map, fromList, keys, (!) )
-
 
 type Contexto = [ ([Evento],Float) ]
 
-type MapaContexto = (Contexto,Contexto,Contexto)
+type MapaContexto = [Contexto]
 
-removeDuplicates:: (Eq a) =>[a]->[a]
+removeDuplicates :: (Eq a) =>[a]->[a]
 removeDuplicates = Prelude.foldl (\seen x -> if x `elem` seen
                                       then seen
                                       else seen ++ [x]) []
@@ -53,3 +53,20 @@ ev x y = (x,y)
 
 f1 :: Float -> Float
 f1 x = x
+
+normalizar :: Contexto -> Contexto
+normalizar micontexto = map (\x -> (fst x,(snd x) / sumaTotal) ) micontexto
+	where
+		sumaTotal = sum ( map snd micontexto)
+
+
+generarAleatorio :: Float
+generarAleatorio = f1 (1)
+
+generarCancion :: MapaContexto -> [Evento]
+generarCancion miMapa = iterate f (0,0)
+	where
+		f elEvento 
+			| elEvento == (0,0) = siguienteEvento (miMapa !! 1) 1.0
+			| (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) == [] = siguienteEvento (miMapa !! 1) 1.0
+			| otherwise = siguienteEvento (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) 1.0
