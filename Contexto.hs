@@ -25,6 +25,10 @@ crearContexto2 listaEventos = Prelude.map (\x -> (x,fromIntegral(calculaRepetici
 		todo = (zipWith f listaEventos (tail listaEventos))
 		f x y = [x,y]
 
+crearMapaContexto :: [Evento] -> MapaContexto
+crearMapaContexto listaEventos = [ [([],fromIntegral (length listaEventos))],
+								crearContexto1 listaEventos,crearContexto2 listaEventos ]
+
 construirMapaRepeticiones:: [[Evento]] -> (Data.Map.Map [Evento] Int)
 construirMapaRepeticiones lista = fromList $ zip lista (Prelude.map (calculaRepeticiones lista) lista)
 
@@ -61,12 +65,13 @@ normalizar micontexto = map (\x -> (fst x,(snd x) / sumaTotal) ) micontexto
 
 
 generarAleatorio :: Float
-generarAleatorio = f1 (1)
+generarAleatorio = 0.3213437418
 
 generarCancion :: MapaContexto -> [Evento]
 generarCancion miMapa = iterate f (0,0)
 	where
 		f elEvento 
-			| elEvento == (0,0) = siguienteEvento (miMapa !! 1) 1.0
-			| (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) == [] = siguienteEvento (miMapa !! 1) 1.0
-			| otherwise = siguienteEvento (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) 1.0
+			| elEvento == (0,0) = siguienteEvento (miMapa !! 1) generarAleatorio
+			| (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) == [] = siguienteEvento (miMapa !! 1) generarAleatorio
+			| otherwise = siguienteEvento (normalizar (buscarElementoOrden2 [elEvento] (miMapa !! 2) )) generarAleatorio
+

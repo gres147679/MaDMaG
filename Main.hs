@@ -5,6 +5,7 @@ import Input
 import Euterpea hiding (Event)
 import Data.List
 import Data.Function
+import Contexto
 
 -- Directorio predeterminado
 directorio :: String
@@ -26,10 +27,11 @@ componer' :: String -> IO ()
 componer' dir = do
   (seqs, filenames) <- loadMusicXmls dir
 
-  -- let modelo = ...
-  -- let composicion = ...
-  putStrLn $ show composicion
-  play $ sequenceToMusic composicion
+  let modelo = crearMapaContexto (concat seqs)
+  let composicion = take longitud $ generarCancion modelo
+
+  -- putStrLn $ show composicion
+  test $ sequenceToMusic composicion
 
 {- Recupera las diez secuencias más similares a la k-ésima secuencia 
    de la colección musical en el directorio por defecto, donde la 
@@ -39,14 +41,16 @@ componer' dir = do
    el número de la secuencia (relativo al orden alfabético de la 
    colección), el nombre de archivo y la distancia a la consulta.
    -}
-buscar :: Int -> IO ()
-buscar = buscar' directorio
+
+
+--buscar :: Int -> IO ()
+--buscar = buscar' directorio
   
-buscar' :: String -> Int -> IO ()
-buscar' dir = do
-  seqfns <- loadMusicXmls dir
-  let seqfns_ordenados = unzip $ sortBy (compare `on` snd) $ zip seqfns
-  -- ...
+--buscar' :: String -> Int -> IO ()
+--buscar' dir = do
+--  seqfns <- loadMusicXmls dir
+--  let seqfns_ordenados = unzip $ sortBy (compare `on` snd) $ zip seqfns
+--  -- ...
 
 tocar :: Int -> IO ()
 tocar n = do
