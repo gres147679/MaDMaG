@@ -1,7 +1,6 @@
 module Contexto where
 
 import Input
-import System.Random
 import Data.Map (Map, fromList, keys, (!) )
 
 type Contexto = [ ([Evento],Float) ]
@@ -13,21 +12,32 @@ removeDuplicates = Prelude.foldl (\seen x -> if x `elem` seen
                                       then seen
                                       else seen ++ [x]) []
 
+buscarProbabilidad:: [Evento] -> Contexto -> Float
+buscarProbabilidad aBuscar miMapa = quitaMaybe (lookup aBuscar miMapa)
+	where
+		quitaMaybe :: Maybe Float -> Float
+		quitaMaybe (Just b) = b
+		quitaMaybe (Nothing) = fromIntegral(0)
+
+
+
 calculaRepeticiones:: (Eq a) => [a] -> a -> Int
 calculaRepeticiones listaEvento eventoABuscar= length $ Prelude.filter (==eventoABuscar) listaEvento
 
 crearContexto1 :: [Evento] -> Contexto
 crearContexto1 listaEventos = Prelude.map (\x -> ([x],fromIntegral(calculaRepeticiones listaEventos x) / fromIntegral(length listaEventos) ) ) (removeDuplicates listaEventos)
 
-crearContexto2 :: [Evento] -> Contexto
-crearContexto2 listaEventos = Prelude.map (\x -> (x,fromIntegral(calculaRepeticiones todo x) / fromIntegral(length todo) ) ) (removeDuplicates todo)
+crearContexto2 :: [Evento] -> Contexto -> Contexto
+crearContexto2 listaEventos orden1 = Prelude.map (\x -> (x, 0.3*(buscarProbabilidad [last x] orden1)+ 0.7*(fromIntegral(calculaRepeticiones todo x) / fromIntegral(calculaRepeticiones listaEventos (head x) )) ) ) (removeDuplicates todo)
 	where 
 		todo = (zipWith f listaEventos (tail listaEventos))
 		f x y = [x,y]
 
 crearMapaContexto :: [Evento] -> MapaContexto
 crearMapaContexto listaEventos = [ [([],fromIntegral (length listaEventos))],
-								crearContexto1 listaEventos,crearContexto2 listaEventos ]
+								contexto1,normalizar (crearContexto2 listaEventos contexto1)]
+	where
+		contexto1 = crearContexto1 listaEventos
 
 construirMapaRepeticiones:: [[Evento]] -> (Data.Map.Map [Evento] Int)
 construirMapaRepeticiones lista = fromList $ zip lista (Prelude.map (calculaRepeticiones lista) lista)
@@ -65,7 +75,7 @@ normalizar micontexto = map (\x -> (fst x,(snd x) / sumaTotal) ) micontexto
 
 
 generarAleatorio :: Float
-generarAleatorio = 0.3213437418
+generarAleatorio = 0.99
 
 generarCancion :: MapaContexto -> [Evento]
 generarCancion miMapa = iterate f (0,0)
@@ -74,4 +84,3 @@ generarCancion miMapa = iterate f (0,0)
 			| elEvento == (0,0) = siguienteEvento (miMapa !! 1) generarAleatorio
 			| (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) == [] = siguienteEvento (miMapa !! 1) generarAleatorio
 			| otherwise = siguienteEvento (normalizar (buscarElementoOrden2 [elEvento] (miMapa !! 2) )) generarAleatorio
-
