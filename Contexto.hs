@@ -1,7 +1,10 @@
 module Contexto where
 
 import Input
+
 import Data.Map (Map, fromList, keys, (!) )
+
+import System.Random
 
 type Contexto = [ ([Evento],Float) ]
 
@@ -51,16 +54,18 @@ distanciaEntreModelos pieza1 pieza2 = sqrt $ fromInteger $ sum $ Prelude.map (\x
 buscarElementoOrden2 :: [Evento] -> Contexto -> Contexto
 buscarElementoOrden2 aBuscar contexto = filter f contexto
 	where
-		f x = (fst x) == aBuscar
+		f x = (head (fst x)) == (head aBuscar)
 
 
 siguienteEvento :: Contexto -> Float -> Evento
 siguienteEvento contexto proba = siguiente contexto proba 0.0
 	where 
+		siguiente [] _ _ = error "Pajuo"
 		siguiente (x:contex) prob acum = 
 			if (acum + (snd x) )>=prob
 			then last $ fst x
 			else siguiente contex prob (acum + (snd x))
+
 
 ev :: Int -> Int -> (Int,Int)
 ev x y = (x,y)
@@ -73,9 +78,11 @@ normalizar micontexto = map (\x -> (fst x,(snd x) / sumaTotal) ) micontexto
 	where
 		sumaTotal = sum ( map snd micontexto)
 
-
 generarAleatorio :: Float
-generarAleatorio = 0.99
+generarAleatorio = fromIntegral (head (tenPseudorandomNumbers 64545523243))
+
+tenPseudorandomNumbers :: Int -> [Int]
+tenPseudorandomNumbers seed = take 10 . randomRs (0, 99) . mkStdGen $ seed
 
 generarCancion :: MapaContexto -> [Evento]
 generarCancion miMapa = iterate f (0,0)

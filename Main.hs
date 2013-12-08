@@ -30,7 +30,8 @@ componer' dir = do
   let modelo = crearMapaContexto (concat seqs)
   let composicion = take longitud $ generarCancion modelo
 
-  -- putStrLn $ show composicion
+  --putStrLn $ show composicion
+  --putStrLn $ show $ buscarElementoOrden2 [ ( 63, 8) ] (modelo !! 2)
   test $ sequenceToMusic composicion
 
 {- Recupera las diez secuencias más similares a la k-ésima secuencia 
@@ -71,3 +72,6 @@ eventToNote e = note
   
 sequenceToMusic :: [Evento] -> Music Note1
 sequenceToMusic es = line $ map eventToNote es
+
+
+main = componer
