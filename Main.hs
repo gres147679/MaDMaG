@@ -48,13 +48,19 @@ componer' dir = do
    -}
 
 
---buscar :: Int -> IO ()
---buscar = buscar' directorio
+buscar :: Int -> IO ()
+buscar = buscar' directorio
   
---buscar' :: String -> Int -> IO ()
---buscar' dir = do
---  seqfns <- loadMusicXmls dir
---  let seqfns_ordenados = unzip $ sortBy (compare `on` snd) $ zip seqfns
+buscar' :: String -> Int -> IO ()
+buscar' dir k = do
+  (seqs, filenames) <- loadMusicXmls dir
+  let listaContextos = map (concat . crearMapaContexto) seqs
+  let listaTuplas = zip (zip filenames [0..]) listaContextos
+  let contextoABuscar = concat $ crearMapaContexto $ head $ drop k seqs
+  mostrarCercanos $ kCercanos 10 contextoABuscar listaTuplas
+
+  --let seqfns_ordenados = unzip $ sortBy (compare `on` snd) $ zip seqfns
+
 --  -- ...
 
 tocar :: Int -> IO ()

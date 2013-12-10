@@ -2,7 +2,7 @@ module Contexto where
 
 import Input
 
-import Data.List (unfoldr)
+import Data.List (unfoldr,sort)
 
 import Data.Map (Map, fromList, keys, (!) )
 
@@ -84,7 +84,7 @@ normalizar micontexto = map (\x -> (fst x,(snd x) / sumaTotal) ) micontexto
 
 
 randomlist :: Int -> StdGen -> [Int]
-randomlist n = take n . unfoldr (Just . (randomR (0,99)))
+randomlist n = take n . unfoldr (Just . (randomR (0,9999)))
 
 
 toFloatArray :: [Int] -> [Float]
@@ -99,4 +99,37 @@ generarCancion longitud randoms miMapa = map fst $ take longitud $ iterate f ((0
 			| (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) == [] = (siguienteEvento (miMapa !! 1) miRandom,index+1)
 			| otherwise = (siguienteEvento (normalizar (buscarElementoOrden2 [elEvento] (miMapa !! 2) )) miRandom,index+1)
 			where
-				miRandom = fromIntegral(randoms !! index) / 100
+				miRandom = fromIntegral(randoms !! index) / 10000
+
+
+noEstaEvento :: Contexto -> [Evento] -> Bool
+noEstaEvento x y = (length $ filter (==y)  (map fst x))<=0
+
+
+uniqueEventos :: Contexto -> Contexto
+uniqueEventos x = foldl f [] x
+	where 
+	f [] y = [y]
+	f y z = if(noEstaEvento y (fst z)) 
+		then y ++ [z]
+		else y
+
+frec :: Contexto -> [Evento] -> Int
+frec x y = length $ filter (==y) (map fst x) 
+
+distancia :: Contexto -> Contexto -> Float
+distancia x y = sqrt (fromIntegral (foldl f 0 (uniqueEventos (x++y))))
+	where 
+	f z w = z + ((frec y (fst w)) - (frec x (fst w)))^2
+
+
+kCercanos :: Int -> Contexto -> [((String,Int),Contexto)] -> [((Float, String), Int)]
+kCercanos k contex lista = tail $ take (k+1) $ Data.List.sort (map f lista)
+	where 
+		f x = ((distancia contex (snd x), fst $ fst x), snd $ fst x)
+
+
+mostrarCercanos :: [((Float, String), Int)] -> IO ()
+mostrarCercanos lista = mapM_ f lista
+	where
+		f x = putStrLn $ (show (snd x)) ++ " " ++ (show $ snd $ fst x) ++" "++ (show $ fst $ fst x)
