@@ -2,6 +2,8 @@ module Contexto where
 
 import Input
 
+import Data.List (unfoldr)
+
 import Data.Map (Map, fromList, keys, (!) )
 
 import System.Random
@@ -58,8 +60,10 @@ buscarElementoOrden2 aBuscar contexto = filter f contexto
 
 
 siguienteEvento :: Contexto -> Float -> Evento
-siguienteEvento contexto proba = siguiente contexto proba 0.0
-	where 
+siguienteEvento contexto proba 
+	| proba > 1.0 = error "Pajuo3"
+	| otherwise = siguiente contexto proba 0.0
+	where
 		siguiente [] _ _ = error "Pajuo"
 		siguiente (x:contex) prob acum = 
 			if (acum + (snd x) )>=prob
@@ -78,16 +82,21 @@ normalizar micontexto = map (\x -> (fst x,(snd x) / sumaTotal) ) micontexto
 	where
 		sumaTotal = sum ( map snd micontexto)
 
-generarAleatorio :: Float
-generarAleatorio = fromIntegral (head (tenPseudorandomNumbers 64545523243))
 
-tenPseudorandomNumbers :: Int -> [Int]
-tenPseudorandomNumbers seed = take 10 . randomRs (0, 99) . mkStdGen $ seed
+randomlist :: Int -> StdGen -> [Int]
+randomlist n = take n . unfoldr (Just . (randomR (0,99)))
 
-generarCancion :: MapaContexto -> [Evento]
-generarCancion miMapa = iterate f (0,0)
+
+toFloatArray :: [Int] -> [Float]
+toFloatArray = map fromIntegral 
+
+generarCancion :: Int -> [Int] -> MapaContexto -> [Evento]
+generarCancion longitud randoms miMapa = map fst $ take longitud $ iterate f ((0,0),0)
 	where
-		f elEvento 
-			| elEvento == (0,0) = siguienteEvento (miMapa !! 1) generarAleatorio
-			| (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) == [] = siguienteEvento (miMapa !! 1) generarAleatorio
-			| otherwise = siguienteEvento (normalizar (buscarElementoOrden2 [elEvento] (miMapa !! 2) )) generarAleatorio
+		f (elEvento,index)
+			| elEvento == (0,0) = do
+				(siguienteEvento (miMapa !! 1) miRandom,index+1)
+			| (buscarElementoOrden2 [elEvento] (miMapa !! 2) ) == [] = (siguienteEvento (miMapa !! 1) miRandom,index+1)
+			| otherwise = (siguienteEvento (normalizar (buscarElementoOrden2 [elEvento] (miMapa !! 2) )) miRandom,index+1)
+			where
+				miRandom = fromIntegral(randoms !! index) / 100

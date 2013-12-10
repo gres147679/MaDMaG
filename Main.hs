@@ -6,6 +6,7 @@ import Euterpea hiding (Event)
 import Data.List
 import Data.Function
 import Contexto
+import System.Random (newStdGen)
 
 -- Directorio predeterminado
 directorio :: String
@@ -26,12 +27,15 @@ componer = componer' directorio
 componer' :: String -> IO ()
 componer' dir = do
   (seqs, filenames) <- loadMusicXmls dir
+  semillaRandom <- newStdGen
 
   let modelo = crearMapaContexto (concat seqs)
-  let composicion = take longitud $ generarCancion modelo
+  let listaRandoms = randomlist longitud semillaRandom
 
-  --putStrLn $ show composicion
-  --putStrLn $ show $ buscarElementoOrden2 [ ( 63, 8) ] (modelo !! 2)
+  let composicion = generarCancion longitud listaRandoms modelo
+
+
+  putStrLn $ show composicion
   test $ sequenceToMusic composicion
 
 {- Recupera las diez secuencias más similares a la k-ésima secuencia 
