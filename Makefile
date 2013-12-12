@@ -1,2 +1,2 @@
 all: Main.hs Input.hs Contexto.hs
-	ghc Main.hs
+	ghc -o music Main.hs
