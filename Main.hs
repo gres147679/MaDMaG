@@ -36,7 +36,7 @@ componer' dir = do
 
 
   putStrLn $ show composicion
-  test $ sequenceToMusic composicion
+  play $ sequenceToMusic composicion
 
 {- Recupera las diez secuencias más similares a la k-ésima secuencia 
    de la colección musical en el directorio por defecto, donde la 
